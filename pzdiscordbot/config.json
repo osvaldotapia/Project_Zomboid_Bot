@@ -1,0 +1,8 @@
+{
+    "TOKEN": "Bot_Token",
+    "COMMAND_PREFIX": "!pz",
+    "ADMIN_ROLES": ["ADMIN_ROLES],
+    "PUERTO_SERVIDOR": 16261,
+    "START_COMMAND": "Ruta del archivo de inicio del servidor",
+    "STOP_COMMAND": "Comando para detener el servidor"
+}
