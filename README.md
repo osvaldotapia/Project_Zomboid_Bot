@@ -12,6 +12,15 @@ Un bot de Discord en Python diseñado para administrar y monitorear un servidor 
 4. **Librería de Discord:**
    ```bash
    pip install discord.py
+   ```
+💻 Comando para instalar screen
+```bash
+# En Ubuntu / Debian / Mint:
+sudo apt update && sudo apt install screen -y
+
+# En CentOS / RHEL / Fedora:
+sudo dnf install screen -y   # o 'sudo yum install screen -y'
+```
 
 ⚙️ Paso 1: Configurar el Bot en Discord Developer Portal
 Entra a Discord Developer Portal y crea una New Application.
