@@ -1,8 +1,21 @@
 {
-    "TOKEN": "Bot_Token",
-    "COMMAND_PREFIX": "!pz",
-    "ADMIN_ROLES": ["ADMIN_ROLES],
+    "TOKEN": "Token de discord",
+    "COMMAND_PREFIX": "!pz ",
+    "SERVER_NAME": "Project Zomboid",
+    "SCREEN_NAME": "Zomboid",
     "PUERTO_SERVIDOR": 16261,
-    "START_COMMAND": "Ruta del archivo de inicio del servidor",
-    "STOP_COMMAND": "Comando para detener el servidor"
+
+    "START_COMMAND": "screen -dmS Zomboid /home/(Usuario)/Zomboid/start-server.sh",
+    "STOP_COMMAND": "screen -S Zomboid -p 0 -X stuff \"quit$(printf '\\r')\"",
+    "LOG_FILE_PATH": "/home/(Usuario)/Zomboid/server-console.txt",
+
+    "STATUS_UPDATE_SECONDS": 15,
+    "PLAYER_QUERY_DELAY": 0.5,
+
+    "ADMIN_ROLES": [
+        "Owner",
+        "IT ADMIN",
+        "Admin"
+    ],
+    "UPDATE_COMMAND": "steamcmd +runscript update_zomboid.txt"
 }
