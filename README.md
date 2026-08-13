@@ -29,4 +29,12 @@ En Scopes, marca bot.
 
 En Bot Permissions, asigna permisos de lectura y envío de mensajes (Send Messages, Read Messages/View Channels, Embed Links).
 
+📂 Paso 2: Estructura del Proyecto
+Crea una carpeta en tu servidor (por ejemplo, /home/usuario/pzbot/) y coloca los dos archivos principales:
+
+Plaintext
+pzbot/
+├── config.json
+└── bot.py
+
 Copia la URL generada y ábrela en tu navegador para autorizar al bot.
