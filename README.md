@@ -33,3 +33,72 @@ En Scopes, selecciona bot.
 En Bot Permissions, asigna: Send Messages, Read Messages/View Channels y Embed Links.
 
 Copia la URL generada y abre el enlace en tu navegador para autorizarlo.
+
+## 📂 Paso 2: Estructura de Archivos
+
+Crea una carpeta en tu servidor y coloca los archivos `config.json` y `bot.py`:
+
+```text
+pzbot/
+├── config.json
+└── bot.py
+```
+
+1. Archivo config.json
+Crea el archivo config.json con la siguiente estructura:
+
+```text
+{
+    "TOKEN": "TU_TOKEN_DE_DISCORD_AQUI",
+    "COMMAND_PREFIX": "!pz ",
+    "SERVER_NAME": "Project Zomboid",
+    "SCREEN_NAME": "Zomboid",
+    "PUERTO_SERVIDOR": 16261,
+
+    "START_COMMAND": "screen -dmS Zomboid /home/usuario/Zomboid/start-server.sh",
+    "STOP_COMMAND": "screen -S Zomboid -p 0 -X stuff \"quit$(printf '\\r')\"",
+    "LOG_FILE_PATH": "/home/usuario/Zomboid/server-console.txt",
+
+    "STATUS_UPDATE_SECONDS": 15,
+    "PLAYER_QUERY_DELAY": 0.5,
+
+    "ADMIN_ROLES": [
+        "Owner",
+        "IT ADMIN",
+        "Admin"
+    ],
+    "UPDATE_COMMAND": "steamcmd +runscript update_zomboid.txt"
+}
+```
+
+### 🛠️ Explicación de los Parámetros del Configuración (`config.json`)
+
+* **`TOKEN`**: Tu token secreto obtenido en el Discord Developer Portal.
+* **`COMMAND_PREFIX`**: Prefijo para invocar los comandos del bot (ejemplo: `!pz `).
+* **`SERVER_NAME`**: Nombre personalizado de tu servidor que se mostrará en las respuestas del bot.
+* **`SCREEN_NAME`**: Nombre de la sesión `screen` de Linux donde se ejecuta tu servidor de PZ.
+* **`PUERTO_SERVIDOR`**: Puerto UDP/IP del servidor (por defecto `16261`).
+* **`START_COMMAND`**: Ruta y comando ejecutable para iniciar el servidor dentro de `screen`.
+* **`STOP_COMMAND`**: Comando encargado de enviar `quit` a la consola del servidor para guardar y apagar de forma segura.
+* **`LOG_FILE_PATH`**: Ruta exacta al archivo `server-console.txt` del servidor para extraer la cantidad de usuarios conectados.
+* **`STATUS_UPDATE_SECONDS`**: Frecuencia (en segundos) con la que el bot actualiza la actividad en Discord.
+* **`ADMIN_ROLES`**: Lista de roles de Discord con permisos para ejecutar comandos de administración (`iniciar`, `apagar`, `reiniciar`).
+
+  ---
+
+## 🚀 Paso 3: Ejecución del Bot
+
+Una vez guardados los archivos `config.json` y `bot.py` en la misma carpeta, puedes probar el bot ejecutando:
+
+```bash
+python3 bot.py
+```
+
+Si todo está bien configurado, verás el mensaje de confirmación en tu consola:
+
+```text
+--------------------------------
+Bot conectado como TuBot#1234
+Desarrollado por: Osvaldo De Los Santos
+--------------------------------
+```
