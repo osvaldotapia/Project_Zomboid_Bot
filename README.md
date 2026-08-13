@@ -102,3 +102,20 @@ Bot conectado como TuBot#1234
 Desarrollado por: Osvaldo De Los Santos
 --------------------------------
 ```
+
+💡 Mantener el Bot corriendo 24/7 en segundo plano
+
+Para evitar que el bot se apague al cerrar tu terminal SSH, es recomendable ejecutarlo dentro de su propia sesión de screen o mediante un servicio de systemd.
+
+## Con GNU Screen
+
+```text
+# 1. Crear una nueva sesión independiente para el bot
+screen -S pzbot
+
+# 2. Iniciar el bot dentro de la sesión
+python3 bot.py
+
+# 3. Salir de la sesión sin apagar el bot:
+# Presiona CTRL + A y luego la tecla D
+```
