@@ -128,3 +128,30 @@ python3 bot.py
 # 3. Salir de la sesión sin apagar el bot:
 # Presiona CTRL + A y luego la tecla D
 ```
+
+📌 Paso 4: Lista de Comandos en Discord
+El bot responderá según el prefijo configurado en config.json (por defecto !pz ).
+
+### 👥 Comandos De Discord
+
+### 👥 Comandos Públicos *(Disponibles para todos los usuarios)*
+
+| Comando | Descripción |
+| :--- | :--- |
+| `!pz help` | Muestra el menú Embed interactivo con la lista de comandos disponibles. |
+| `!pz estado` | Consulta el estado actual del servidor (Online/Offline), puerto y cantidad de jugadores. |
+| `!pz jugadores` | Muestra el número exacto y la lista de jugadores conectados al servidor. |
+
+<img width="288" height="300" alt="image_help" src="https://github.com/user-attachments/assets/cbec554d-dbf6-4a58-8360-242bdcd570be" />
+
+<img width="288" height="300" alt="image_estado" src="https://github.com/user-attachments/assets/9d438a80-10e9-456d-98c9-c3a8cc2ebc1a" />
+<img width="288" height="300" alt="image_jugadores" src="https://github.com/user-attachments/assets/b80ee64a-2e59-40df-875d-6b0e85a35d48" />
+
+
+### 🛡️ Comandos de Administración *(Requieren roles configurados en `ADMIN_ROLES`)*
+
+| Comando | Descripción |
+| :--- | :--- |
+| `!pz iniciar` | Arranca la sesión `screen` del servidor si este se encuentra apagado. |
+| `!pz apagar` | Envía el comando `quit` al servidor para guardar la partida y cerrar el proceso limpiamente. |
+| `!pz reiniciar` | Guarda la partida, apaga el servidor de forma segura y vuelve a levantarlo automáticamente. |
