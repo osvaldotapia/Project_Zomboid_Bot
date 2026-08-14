@@ -155,3 +155,13 @@ El bot responderá según el prefijo configurado en config.json (por defecto !pz
 | `!pz iniciar` | Arranca la sesión `screen` del servidor si este se encuentra apagado. |
 | `!pz apagar` | Envía el comando `quit` al servidor para guardar la partida y cerrar el proceso limpiamente. |
 | `!pz reiniciar` | Guarda la partida, apaga el servidor de forma segura y vuelve a levantarlo automáticamente. |
+
+---
+
+## ☕ Apoya el Proyecto
+
+Si este bot te ha sido de utilidad para administrar tu servidor y deseas apoyar su desarrollo, ¡cualquier contribución es enormemente apreciada!
+
+<a href="https://paypal.me/TPBlanco" target="_blank">
+  <img src="https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge&logo=paypal" alt="Donar a través de PayPal" />
+</a>
