@@ -142,8 +142,8 @@ El bot responderá según el prefijo configurado en config.json (por defecto !pz
 | `!pz estado` | Consulta el estado actual del servidor (Online/Offline), puerto y cantidad de jugadores. |
 | `!pz jugadores` | Muestra el número exacto y la lista de jugadores conectados al servidor. |
 
-<img width="288" height="300" alt="image_help" src="https://github.com/user-attachments/assets/cbec554d-dbf6-4a58-8360-242bdcd570be" />
 
+<img width="288" height="300" alt="image_help" src="https://github.com/user-attachments/assets/19f45753-0b7d-46d5-a050-f03784f27975" />
 <img width="288" height="300" alt="image_estado" src="https://github.com/user-attachments/assets/9d438a80-10e9-456d-98c9-c3a8cc2ebc1a" />
 <img width="288" height="300" alt="image_jugadores" src="https://github.com/user-attachments/assets/b80ee64a-2e59-40df-875d-6b0e85a35d48" />
 
