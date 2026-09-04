@@ -17,5 +17,5 @@
         "IT ADMIN",
         "Admin"
     ],
-    "UPDATE_COMMAND": "steamcmd +runscript update_zomboid.txt"
+    "UPDATE_COMMAND": "steamcmd +runscript ~/pzdiscordbot/update_zomboid.txt"
 }
