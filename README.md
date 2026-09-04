@@ -98,7 +98,7 @@ Crea el archivo config.json con la siguiente estructura:
 
 ## 🚀 Paso 3: Ejecución del Bot
 
-Una vez guardados los archivos `config.json` y `bot.py` en la misma carpeta, puedes probar el bot ejecutando:
+Una vez guardados los archivos `config.json`, `bot.py` y `update_zomboid.txt` en la misma carpeta, puedes probar el bot ejecutando:
 
 ```bash
 python3 bot.py
