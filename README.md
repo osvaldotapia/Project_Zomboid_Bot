@@ -51,6 +51,7 @@ Crea una carpeta en tu servidor y coloca los archivos `config.json` y `bot.py`:
 pzbot/
 ├── config.json
 └── bot.py
+└── update_zomboid.txt
 ```
 
 1. Archivo config.json
