@@ -85,6 +85,13 @@ bot = commands.Bot(
 
 ultimo_estado = "DESCONOCIDO"
 
+# ============================================================
+# ESTADO DE ACTUALIZACION
+# ============================================================
+
+actualizacion_en_curso = False
+actualizacion_lock = asyncio.Lock()
+
 
 # ============================================================
 # FUNCIONES AUXILIARES
@@ -488,6 +495,12 @@ async def ayuda(ctx):
     embed.add_field(
         name=f"{PREFIX}reiniciar",
         value="Guarda, apaga y vuelve a iniciar el servidor. (Admin)",
+        inline=False
+    )
+
+    embed.add_field(
+        name=f"{PREFIX}actualizar",
+        value="Actualiza el servidor mediante SteamCMD. (Admin)",
         inline=False
     )
 
@@ -898,6 +911,426 @@ async def reiniciar(ctx):
                 "⚠️ El comando de inicio fue ejecutado, "
                 "pero no se detectó la sesión screen."
             )
+        )
+
+
+# ============================================================
+# ACTUALIZAR SERVIDOR
+# ============================================================
+
+class ConfirmarActualizacionView(discord.ui.View):
+
+    def __init__(self, ctx):
+        super().__init__(timeout=120)
+        self.ctx = ctx
+
+    @discord.ui.button(
+        label="Apagar y actualizar",
+        style=discord.ButtonStyle.danger,
+        emoji="🛑"
+    )
+    async def apagar_actualizar(self, interaction, button):
+
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message(
+                "🚫 Solo la persona que inició la actualización puede usar estos botones.",
+                ephemeral=True
+            )
+            return
+
+        await interaction.response.defer()
+        self.stop()
+
+        await iniciar_proceso_actualizacion(
+            self.ctx,
+            interaction.message
+        )
+
+    @discord.ui.button(
+        label="Cancelar",
+        style=discord.ButtonStyle.secondary,
+        emoji="❌"
+    )
+    async def cancelar(self, interaction, button):
+
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message(
+                "🚫 Solo la persona que inició la actualización puede usar estos botones.",
+                ephemeral=True
+            )
+            return
+
+        await interaction.response.edit_message(
+            content="❌ Actualización cancelada.",
+            view=None
+        )
+
+        self.stop()
+
+
+class IniciarDespuesActualizacionView(discord.ui.View):
+
+    def __init__(self, ctx):
+        super().__init__(timeout=120)
+        self.ctx = ctx
+
+    @discord.ui.button(
+        label="Iniciar servidor",
+        style=discord.ButtonStyle.success,
+        emoji="🚀"
+    )
+    async def iniciar_servidor(self, interaction, button):
+
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message(
+                "🚫 Solo la persona que inició la actualización puede usar estos botones.",
+                ephemeral=True
+            )
+            return
+
+        await interaction.response.defer()
+        self.stop()
+
+        await iniciar_servidor_despues_actualizacion(
+            self.ctx,
+            interaction.message
+        )
+
+    @discord.ui.button(
+        label="No iniciar",
+        style=discord.ButtonStyle.secondary,
+        emoji="❌"
+    )
+    async def no_iniciar(self, interaction, button):
+
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message(
+                "🚫 Solo la persona que inició la actualización puede usar estos botones.",
+                ephemeral=True
+            )
+            return
+
+        await interaction.response.edit_message(
+            content="ℹ️ Actualización terminada. El servidor permanecerá apagado.",
+            view=None
+        )
+
+        self.stop()
+
+
+async def ejecutar_actualizacion():
+
+    """
+    Ejecuta UPDATE_COMMAND de config.json de forma asíncrona.
+    Devuelve (True, salida) si SteamCMD termina correctamente.
+    """
+
+    if not UPDATE_COMMAND:
+        return False, "UPDATE_COMMAND no está configurado."
+
+    try:
+
+        proceso = await asyncio.create_subprocess_shell(
+            UPDATE_COMMAND,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT
+        )
+
+        salida = []
+
+        while True:
+
+            linea = await proceso.stdout.readline()
+
+            if not linea:
+                break
+
+            texto = linea.decode(
+                "utf-8",
+                errors="replace"
+            ).rstrip()
+
+            if texto:
+                salida.append(texto)
+                print(f"[UPDATE] {texto}")
+
+        codigo = await proceso.wait()
+
+        return codigo == 0, "\n".join(salida[-20:])
+
+    except Exception as error:
+
+        print(
+            f"❌ Error ejecutando actualización: {error}"
+        )
+
+        return False, str(error)
+
+
+async def mostrar_pregunta_iniciar(
+    ctx,
+    mensaje
+):
+
+    await mensaje.edit(
+        content=(
+            "✅ **Actualización completada correctamente.**\n\n"
+            "Project Zomboid ya fue actualizado.\n"
+            "¿Deseas iniciar nuevamente el servidor?"
+        ),
+        view=IniciarDespuesActualizacionView(ctx)
+    )
+
+
+async def iniciar_servidor_despues_actualizacion(
+    ctx,
+    mensaje
+):
+
+    global actualizacion_en_curso
+
+    await mensaje.edit(
+        content="🚀 Iniciando nuevamente Project Zomboid...",
+        view=None
+    )
+
+    resultado = ejecutar_comando(
+        START_COMMAND
+    )
+
+    if not resultado:
+
+        actualizacion_en_curso = False
+
+        await mensaje.edit(
+            content="❌ Error ejecutando el comando de inicio."
+        )
+
+        return
+
+    iniciado = await esperar_servidor_arranque(
+        90
+    )
+
+    actualizacion_en_curso = False
+
+    if iniciado:
+
+        await mensaje.edit(
+            content="✅ Servidor actualizado e iniciado correctamente."
+        )
+
+    else:
+
+        await mensaje.edit(
+            content=(
+                "⚠️ El comando de inicio fue ejecutado, "
+                "pero no se detectó la sesión screen."
+            )
+        )
+
+
+async def iniciar_proceso_actualizacion(
+    ctx,
+    mensaje
+):
+
+    global actualizacion_en_curso
+
+    try:
+
+        # --------------------------------------------------------
+        # SI ESTABA ENCENDIDO, APAGARLO PRIMERO
+        # --------------------------------------------------------
+
+        if servidor_encendido():
+
+            await mensaje.edit(
+                content=(
+                    "🛑 Enviando `quit` al servidor para guardar "
+                    "la partida antes de actualizar..."
+                ),
+                view=None
+            )
+
+            resultado_apagado = ejecutar_comando(
+                STOP_COMMAND
+            )
+
+            if not resultado_apagado:
+
+                actualizacion_en_curso = False
+
+                await mensaje.edit(
+                    content=(
+                        "❌ No se pudo enviar el comando `quit` "
+                        "al servidor. La actualización fue cancelada."
+                    )
+                )
+
+                return
+
+            await mensaje.edit(
+                content=(
+                    "💾 Guardando partida y esperando a que "
+                    "Project Zomboid termine de apagarse..."
+                ),
+                view=None
+            )
+
+            apagado = await esperar_servidor_apagado(
+                120
+            )
+
+            if not apagado:
+
+                actualizacion_en_curso = False
+
+                await mensaje.edit(
+                    content=(
+                        "❌ El servidor no terminó de apagarse "
+                        "dentro del tiempo esperado.\n"
+                        "La actualización fue cancelada."
+                    )
+                )
+
+                return
+
+        # --------------------------------------------------------
+        # ACTUALIZAR
+        # --------------------------------------------------------
+
+        await asyncio.sleep(3)
+
+        await mensaje.edit(
+            content=(
+                "🔄 **Actualizando Project Zomboid...**\n\n"
+                "⏳ SteamCMD está descargando/verificando los archivos.\n"
+                "Esto puede tardar varios minutos."
+            ),
+            view=None
+        )
+
+        actualizado, salida = await ejecutar_actualizacion()
+
+        if not actualizado:
+
+            actualizacion_en_curso = False
+
+            await mensaje.edit(
+                content=(
+                    "❌ **La actualización falló.**\n\n"
+                    "SteamCMD devolvió un error.\n"
+                    "El servidor permanecerá apagado.\n\n"
+                    "Revisa la consola del bot para ver el detalle."
+                ),
+                view=None
+            )
+
+            return
+
+        # --------------------------------------------------------
+        # ACTUALIZACION TERMINADA
+        # --------------------------------------------------------
+
+        await mostrar_pregunta_iniciar(
+            ctx,
+            mensaje
+        )
+
+    except Exception as error:
+
+        actualizacion_en_curso = False
+
+        print(
+            f"❌ Error durante actualización: {error}"
+        )
+
+        await mensaje.edit(
+            content=(
+                "❌ Ocurrió un error durante la actualización.\n"
+                "El servidor permanecerá apagado."
+            ),
+            view=None
+        )
+
+
+@bot.command(
+    name="actualizar"
+)
+async def actualizar(ctx):
+
+    global actualizacion_en_curso
+
+    if not es_admin(ctx):
+
+        await ctx.send(
+            "🚫 No tienes permisos para actualizar el servidor."
+        )
+
+        return
+
+    # ------------------------------------------------------------
+    # EVITAR DOS ACTUALIZACIONES AL MISMO TIEMPO
+    # ------------------------------------------------------------
+
+    if actualizacion_en_curso:
+
+        await ctx.send(
+            "⚠️ Ya hay una actualización del servidor en curso."
+        )
+
+        return
+
+    async with actualizacion_lock:
+
+        if actualizacion_en_curso:
+
+            await ctx.send(
+                "⚠️ Ya hay una actualización del servidor en curso."
+            )
+
+            return
+
+        actualizacion_en_curso = True
+
+        # --------------------------------------------------------
+        # SI EL SERVIDOR ESTÁ ENCENDIDO
+        # --------------------------------------------------------
+
+        if servidor_encendido():
+
+            mensaje = await ctx.send(
+                (
+                    "🔄 **Actualizar servidor**\n\n"
+                    "🟢 El servidor está actualmente encendido.\n"
+                    "Para actualizar Project Zomboid es necesario "
+                    "apagarlo primero.\n\n"
+                    "¿Deseas apagar el servidor y continuar "
+                    "con la actualización?"
+                ),
+                view=ConfirmarActualizacionView(ctx)
+            )
+
+            # La tarea continuará desde el botón.
+            # No liberamos el estado hasta que termine la operación.
+            return
+
+        # --------------------------------------------------------
+        # SI YA ESTÁ APAGADO
+        # --------------------------------------------------------
+
+        mensaje = await ctx.send(
+            (
+                "🔄 **Actualización de Project Zomboid**\n\n"
+                "🔴 El servidor ya está apagado.\n"
+                "Iniciando actualización..."
+            )
+        )
+
+        await iniciar_proceso_actualizacion(
+            ctx,
+            mensaje
         )
 
 
