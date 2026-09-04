@@ -76,7 +76,7 @@ Crea el archivo config.json con la siguiente estructura:
         "IT ADMIN",
         "Admin"
     ],
-    "UPDATE_COMMAND": "steamcmd +runscript update_zomboid.txt"
+    "UPDATE_COMMAND": "steamcmd +runscript ~/pzdiscordbot/update_zomboid.txt"
 }
 ```
 
@@ -155,6 +155,7 @@ El bot responderá según el prefijo configurado en config.json (por defecto !pz
 | `!pz iniciar` | Arranca la sesión `screen` del servidor si este se encuentra apagado. |
 | `!pz apagar` | Envía el comando `quit` al servidor para guardar la partida y cerrar el proceso limpiamente. |
 | `!pz reiniciar` | Guarda la partida, apaga el servidor de forma segura y vuelve a levantarlo automáticamente. |
+| `!pz actualizar` | Guarda la partida, apaga el servidor de forma segura, actualiza el servidor via STEAMCMD, pregunta si deseas subir el servidor y vuelve a levantarlo automáticamente. |
 
 ---
 
